@@ -18,7 +18,8 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -120,7 +121,8 @@ label,
   font-weight: 700;
 }
 
-input:not([type="color"]) {
+input:not([type="color"]),
+select {
   width: 100%;
   min-height: 46px;
   border: 1px solid #cbd5e1;
@@ -167,6 +169,8 @@ input:not([type="color"]) {
 .preset-grid button,
 .shape-grid button,
 .icon-grid button,
+.idea-controls button,
+.idea-card button,
 .export-grid button,
 .primary-action,
 .install-band button {
@@ -321,6 +325,62 @@ input[type="color"] {
   height: 42px;
 }
 
+.ideas-panel {
+  background: #fbfcff;
+}
+
+.idea-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.idea-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.idea-card {
+  display: grid;
+  grid-template-columns: 54px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid #dbe2ee;
+  border-radius: 8px;
+  padding: 12px;
+  background: #ffffff;
+}
+
+.idea-swatch {
+  display: grid;
+  width: 54px;
+  height: 54px;
+  place-items: center;
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.36);
+}
+
+.idea-swatch span {
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.idea-card h3 {
+  margin: 0 0 4px;
+  color: #111827;
+  font-size: 0.94rem;
+}
+
+.idea-card p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
 .export-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -371,6 +431,7 @@ pre {
   .input-row,
   .color-grid,
   .preset-grid,
+  .idea-controls,
   .export-grid {
     grid-template-columns: 1fr;
   }
@@ -381,5 +442,13 @@ pre {
 
   .icon-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .idea-card {
+    grid-template-columns: 48px 1fr;
+  }
+
+  .idea-card button {
+    grid-column: 1 / -1;
   }
 }

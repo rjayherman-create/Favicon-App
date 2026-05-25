@@ -61,6 +61,16 @@ type IconOption = {
   label: string;
   Icon: LucideIcon;
 };
+type FaviconIdea = {
+  title: string;
+  reason: string;
+  icon: IconKey;
+  bg: string;
+  fg: string;
+  accent: string;
+  shape: Shape;
+  initials?: string;
+};
 
 const presets: Preset[] = [
   { name: "SaaS Blue", bg: "#1d4ed8", fg: "#ffffff", accent: "#38bdf8", shape: "rounded" },
@@ -86,10 +96,90 @@ const iconOptions: IconOption[] = [
   { key: "globe", label: "Global", Icon: Globe },
   { key: "star", label: "Star", Icon: Star },
 ];
+const industryIdeas: Record<string, Pick<FaviconIdea, "icon" | "title" | "reason">[]> = {
+  saas: [
+    { icon: "rocket", title: "Launch Mark", reason: "Strong for builders, MVPs, and startup tools." },
+    { icon: "code", title: "Builder Brackets", reason: "Clear software signal that stays readable at tiny sizes." },
+    { icon: "zap", title: "Fast Signal", reason: "Good for automation, testing, speed, and productivity." },
+  ],
+  finance: [
+    { icon: "shield", title: "Trust Lockup", reason: "Feels stable and secure for money-adjacent products." },
+    { icon: "briefcase", title: "Operator Badge", reason: "Works for business dashboards and client portals." },
+    { icon: "star", title: "Premium Mark", reason: "Simple, memorable, and polished for paid products." },
+  ],
+  health: [
+    { icon: "health", title: "Care Pulse", reason: "Signals health and support without crowding the favicon." },
+    { icon: "pill", title: "Rx Badge", reason: "Best for medication, pharmacy, and wellness tools." },
+    { icon: "shield", title: "Safe Care", reason: "Adds a trust layer for sensitive user workflows." },
+  ],
+  ecommerce: [
+    { icon: "cart", title: "Checkout Dot", reason: "Direct shopping cue with strong tab recognition." },
+    { icon: "zap", title: "Deal Flash", reason: "Useful for offers, savings, and conversion tools." },
+    { icon: "star", title: "Favorite Find", reason: "Friendly for marketplaces and curated shops." },
+  ],
+  realestate: [
+    { icon: "home", title: "Property Pin", reason: "Instantly recognizable for housing and property products." },
+    { icon: "shield", title: "Home Trust", reason: "Good for taxes, insurance, and ownership workflows." },
+    { icon: "briefcase", title: "Deal Desk", reason: "Fits investor and agent productivity dashboards." },
+  ],
+  productivity: [
+    { icon: "calendar", title: "Planner Tile", reason: "Good for scheduling, reminders, and ops tools." },
+    { icon: "wrench", title: "Tool Spark", reason: "Practical, utility-first signal for small web tools." },
+    { icon: "zap", title: "Action Bolt", reason: "Reads as quick, capable, and modern." },
+  ],
+};
+const vibePalettes: Record<string, Pick<FaviconIdea, "bg" | "fg" | "accent" | "shape">[]> = {
+  modern: [
+    { bg: "#111827", fg: "#ffffff", accent: "#38bdf8", shape: "squircle" },
+    { bg: "#0f766e", fg: "#ecfeff", accent: "#5eead4", shape: "rounded" },
+  ],
+  playful: [
+    { bg: "#be123c", fg: "#fff1f2", accent: "#fbbf24", shape: "circle" },
+    { bg: "#7c3aed", fg: "#ffffff", accent: "#fb7185", shape: "rounded" },
+  ],
+  premium: [
+    { bg: "#18181b", fg: "#fafafa", accent: "#f59e0b", shape: "square" },
+    { bg: "#312e81", fg: "#eef2ff", accent: "#c4b5fd", shape: "squircle" },
+  ],
+  trustworthy: [
+    { bg: "#1e3a8a", fg: "#eff6ff", accent: "#22c55e", shape: "rounded" },
+    { bg: "#164e63", fg: "#ecfeff", accent: "#67e8f9", shape: "squircle" },
+  ],
+};
 const installSnippet = `<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="manifest" href="/site.webmanifest" />`;
+
+function getInitials(name: string) {
+  const words = name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (words.length === 0) return "AI";
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return words
+    .slice(0, 3)
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase();
+}
+
+function generateFaviconIdeas(brandName: string, industry: string, vibe: string): FaviconIdea[] {
+  const conceptPool = industryIdeas[industry] ?? industryIdeas.saas;
+  const palettePool = vibePalettes[vibe] ?? vibePalettes.modern;
+  const initials = getInitials(brandName);
+
+  return conceptPool.slice(0, 3).map((concept, index) => {
+    const palette = palettePool[index % palettePool.length];
+    return {
+      ...concept,
+      ...palette,
+      initials: index === 2 ? initials : undefined,
+      icon: index === 2 && initials.length <= 3 ? "initials" : concept.icon,
+    };
+  });
+}
 
 function roundedRect(ctx: CanvasRenderingContext2D, size: number, radius: number) {
   ctx.beginPath();
@@ -329,6 +419,11 @@ function App() {
   const [shadow, setShadow] = React.useState(true);
   const [selectedIcon, setSelectedIcon] = React.useState<IconKey>("initials");
   const [uploadedLogo, setUploadedLogo] = React.useState<string | null>(null);
+  const [ideaIndustry, setIdeaIndustry] = React.useState("saas");
+  const [ideaVibe, setIdeaVibe] = React.useState("modern");
+  const [faviconIdeas, setFaviconIdeas] = React.useState<FaviconIdea[]>(() =>
+    generateFaviconIdeas("Test Pilot", "saas", "modern"),
+  );
   const [copied, setCopied] = React.useState(false);
   const [previewUrl, setPreviewUrl] = React.useState("");
 
@@ -488,6 +583,22 @@ function App() {
   function chooseIcon(icon: IconKey) {
     setSelectedIcon(icon);
     setUploadedLogo(null);
+  }
+
+  function generateIdeas() {
+    setFaviconIdeas(generateFaviconIdeas(appName, ideaIndustry, ideaVibe));
+  }
+
+  function applyIdea(idea: FaviconIdea) {
+    setBgColor(idea.bg);
+    setIconColor(idea.fg);
+    setAccentColor(idea.accent);
+    setShape(idea.shape);
+    setSelectedIcon(idea.icon);
+    setUploadedLogo(null);
+    if (idea.initials) {
+      setInitials(idea.initials);
+    }
   }
 
   async function copyInstallSnippet() {
@@ -661,6 +772,63 @@ function App() {
               {previewUrl ? <img src={previewUrl} alt="" /> : null}
               <span>Apple</span>
             </div>
+          </div>
+        </section>
+
+        <section className="panel ideas-panel">
+          <div className="panel-heading">
+            <Sparkles size={20} />
+            <h2>AI Favicon Ideas</h2>
+          </div>
+
+          <div className="idea-controls">
+            <label>
+              <span>Industry</span>
+              <select value={ideaIndustry} onChange={(event) => setIdeaIndustry(event.target.value)}>
+                <option value="saas">SaaS / software</option>
+                <option value="finance">Finance / business</option>
+                <option value="health">Health / pharmacy</option>
+                <option value="ecommerce">Ecommerce</option>
+                <option value="realestate">Real estate</option>
+                <option value="productivity">Productivity / tools</option>
+              </select>
+            </label>
+            <label>
+              <span>Vibe</span>
+              <select value={ideaVibe} onChange={(event) => setIdeaVibe(event.target.value)}>
+                <option value="modern">Modern</option>
+                <option value="playful">Playful</option>
+                <option value="premium">Premium</option>
+                <option value="trustworthy">Trustworthy</option>
+              </select>
+            </label>
+            <button type="button" onClick={generateIdeas}>
+              <Sparkles size={17} />
+              Generate ideas
+            </button>
+          </div>
+
+          <div className="idea-list">
+            {faviconIdeas.map((idea) => {
+              const Icon = iconOptions.find((option) => option.key === idea.icon)?.Icon ?? Sparkles;
+              return (
+                <article key={`${idea.title}-${idea.bg}`} className="idea-card">
+                  <div
+                    className="idea-swatch"
+                    style={{ background: `linear-gradient(135deg, ${idea.bg}, ${idea.accent})`, color: idea.fg }}
+                  >
+                    {idea.icon === "initials" ? <span>{idea.initials}</span> : <Icon size={28} />}
+                  </div>
+                  <div>
+                    <h3>{idea.title}</h3>
+                    <p>{idea.reason}</p>
+                  </div>
+                  <button type="button" onClick={() => applyIdea(idea)}>
+                    Apply
+                  </button>
+                </article>
+              );
+            })}
           </div>
         </section>
 
