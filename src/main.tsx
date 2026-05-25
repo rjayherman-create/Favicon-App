@@ -3,29 +3,63 @@ import ReactDOM from "react-dom/client";
 import {
   Apple,
   BadgeCheck,
+  Briefcase,
+  Calendar,
   Circle,
+  Code2,
   Copy,
   Download,
+  Globe,
+  HeartPulse,
+  Home,
   ImagePlus,
   Monitor,
   Moon,
   Package,
   Palette,
+  Pill,
+  Rocket,
+  Shield,
+  ShoppingCart,
   Smartphone,
   Square,
   Sparkles,
+  Star,
   Upload,
+  Wrench,
+  Zap,
+  type LucideIcon,
 } from "lucide-react";
 import JSZip from "jszip";
 import "./styles.css";
 
 type Shape = "rounded" | "square" | "circle" | "squircle";
+type IconKey =
+  | "initials"
+  | "rocket"
+  | "zap"
+  | "shield"
+  | "home"
+  | "cart"
+  | "calendar"
+  | "pill"
+  | "wrench"
+  | "health"
+  | "briefcase"
+  | "code"
+  | "globe"
+  | "star";
 type Preset = {
   name: string;
   bg: string;
   fg: string;
   accent: string;
   shape: Shape;
+};
+type IconOption = {
+  key: IconKey;
+  label: string;
+  Icon: LucideIcon;
 };
 
 const presets: Preset[] = [
@@ -36,6 +70,22 @@ const presets: Preset[] = [
 ];
 
 const exportSizes = [16, 32, 48, 180, 192, 512];
+const iconOptions: IconOption[] = [
+  { key: "initials", label: "Initials", Icon: Sparkles },
+  { key: "rocket", label: "Launch", Icon: Rocket },
+  { key: "zap", label: "Energy", Icon: Zap },
+  { key: "shield", label: "Trust", Icon: Shield },
+  { key: "home", label: "Home", Icon: Home },
+  { key: "cart", label: "Shop", Icon: ShoppingCart },
+  { key: "calendar", label: "Calendar", Icon: Calendar },
+  { key: "pill", label: "Health", Icon: Pill },
+  { key: "wrench", label: "Tools", Icon: Wrench },
+  { key: "health", label: "Care", Icon: HeartPulse },
+  { key: "briefcase", label: "Business", Icon: Briefcase },
+  { key: "code", label: "Code", Icon: Code2 },
+  { key: "globe", label: "Global", Icon: Globe },
+  { key: "star", label: "Star", Icon: Star },
+];
 const installSnippet = `<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -55,6 +105,20 @@ function roundedRect(ctx: CanvasRenderingContext2D, size: number, radius: number
   ctx.closePath();
 }
 
+function roundedBox(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number) {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  ctx.lineTo(x + radius, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+}
+
 function drawShape(ctx: CanvasRenderingContext2D, shape: Shape, size: number) {
   if (shape === "circle") {
     ctx.beginPath();
@@ -68,6 +132,149 @@ function drawShape(ctx: CanvasRenderingContext2D, shape: Shape, size: number) {
   }
 
   roundedRect(ctx, size, shape === "squircle" ? size * 0.34 : size * 0.2);
+}
+
+function drawCanvasIcon(ctx: CanvasRenderingContext2D, icon: IconKey, size: number, color: string) {
+  const cx = size / 2;
+  const cy = size / 2;
+  const unit = size / 512;
+
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = 42 * unit;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+
+  if (icon === "rocket") {
+    ctx.beginPath();
+    ctx.moveTo(cx - 74 * unit, cy + 80 * unit);
+    ctx.quadraticCurveTo(cx - 10 * unit, cy - 120 * unit, cx + 128 * unit, cy - 156 * unit);
+    ctx.quadraticCurveTo(cx + 92 * unit, cy - 18 * unit, cx - 108 * unit, cy + 46 * unit);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(cx + 44 * unit, cy - 74 * unit, 30 * unit, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(cx - 112 * unit, cy + 58 * unit);
+    ctx.lineTo(cx - 154 * unit, cy + 134 * unit);
+    ctx.lineTo(cx - 74 * unit, cy + 98 * unit);
+    ctx.stroke();
+  } else if (icon === "zap") {
+    ctx.beginPath();
+    ctx.moveTo(cx + 28 * unit, cy - 172 * unit);
+    ctx.lineTo(cx - 92 * unit, cy + 18 * unit);
+    ctx.lineTo(cx + 22 * unit, cy + 18 * unit);
+    ctx.lineTo(cx - 28 * unit, cy + 172 * unit);
+    ctx.lineTo(cx + 106 * unit, cy - 28 * unit);
+    ctx.lineTo(cx - 14 * unit, cy - 28 * unit);
+    ctx.closePath();
+    ctx.fill();
+  } else if (icon === "shield") {
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - 172 * unit);
+    ctx.lineTo(cx + 132 * unit, cy - 112 * unit);
+    ctx.lineTo(cx + 108 * unit, cy + 66 * unit);
+    ctx.quadraticCurveTo(cx + 78 * unit, cy + 128 * unit, cx, cy + 170 * unit);
+    ctx.quadraticCurveTo(cx - 78 * unit, cy + 128 * unit, cx - 108 * unit, cy + 66 * unit);
+    ctx.lineTo(cx - 132 * unit, cy - 112 * unit);
+    ctx.closePath();
+    ctx.stroke();
+  } else if (icon === "home") {
+    ctx.beginPath();
+    ctx.moveTo(cx - 154 * unit, cy - 10 * unit);
+    ctx.lineTo(cx, cy - 142 * unit);
+    ctx.lineTo(cx + 154 * unit, cy - 10 * unit);
+    ctx.stroke();
+    ctx.strokeRect(cx - 106 * unit, cy - 8 * unit, 212 * unit, 154 * unit);
+  } else if (icon === "cart") {
+    ctx.beginPath();
+    ctx.moveTo(cx - 158 * unit, cy - 118 * unit);
+    ctx.lineTo(cx - 112 * unit, cy - 118 * unit);
+    ctx.lineTo(cx - 76 * unit, cy + 54 * unit);
+    ctx.lineTo(cx + 116 * unit, cy + 54 * unit);
+    ctx.lineTo(cx + 148 * unit, cy - 54 * unit);
+    ctx.lineTo(cx - 90 * unit, cy - 54 * unit);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(cx - 58 * unit, cy + 124 * unit, 24 * unit, 0, Math.PI * 2);
+    ctx.arc(cx + 102 * unit, cy + 124 * unit, 24 * unit, 0, Math.PI * 2);
+    ctx.stroke();
+  } else if (icon === "calendar") {
+    roundedBox(ctx, cx - 139 * unit, cy - 118 * unit, 278 * unit, 236 * unit, 20 * unit);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(cx - 139 * unit, cy - 36 * unit);
+    ctx.lineTo(cx + 139 * unit, cy - 36 * unit);
+    ctx.stroke();
+  } else if (icon === "pill") {
+    ctx.translate(cx, cy);
+    ctx.rotate(-Math.PI / 4);
+    roundedBox(ctx, -140 * unit, -58 * unit, 280 * unit, 116 * unit, 58 * unit);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0, 58 * unit);
+    ctx.lineTo(0, -58 * unit);
+    ctx.stroke();
+    ctx.restore();
+    return;
+  } else if (icon === "wrench") {
+    ctx.beginPath();
+    ctx.arc(cx + 84 * unit, cy - 92 * unit, 62 * unit, Math.PI * 0.18, Math.PI * 1.38);
+    ctx.moveTo(cx + 38 * unit, cy - 48 * unit);
+    ctx.lineTo(cx - 126 * unit, cy + 116 * unit);
+    ctx.arc(cx - 138 * unit, cy + 128 * unit, 28 * unit, Math.PI * 0.75, Math.PI * 2.6);
+    ctx.stroke();
+  } else if (icon === "health") {
+    ctx.beginPath();
+    ctx.moveTo(cx - 160 * unit, cy + 8 * unit);
+    ctx.lineTo(cx - 86 * unit, cy + 8 * unit);
+    ctx.lineTo(cx - 46 * unit, cy - 76 * unit);
+    ctx.lineTo(cx + 18 * unit, cy + 104 * unit);
+    ctx.lineTo(cx + 62 * unit, cy + 8 * unit);
+    ctx.lineTo(cx + 160 * unit, cy + 8 * unit);
+    ctx.stroke();
+  } else if (icon === "briefcase") {
+    roundedBox(ctx, cx - 146 * unit, cy - 60 * unit, 292 * unit, 200 * unit, 26 * unit);
+    ctx.stroke();
+    ctx.strokeRect(cx - 54 * unit, cy - 118 * unit, 108 * unit, 58 * unit);
+  } else if (icon === "code") {
+    ctx.beginPath();
+    ctx.moveTo(cx - 42 * unit, cy - 152 * unit);
+    ctx.lineTo(cx - 98 * unit, cy + 152 * unit);
+    ctx.moveTo(cx - 142 * unit, cy - 68 * unit);
+    ctx.lineTo(cx - 204 * unit, cy);
+    ctx.lineTo(cx - 142 * unit, cy + 68 * unit);
+    ctx.moveTo(cx + 142 * unit, cy - 68 * unit);
+    ctx.lineTo(cx + 204 * unit, cy);
+    ctx.lineTo(cx + 142 * unit, cy + 68 * unit);
+    ctx.stroke();
+  } else if (icon === "globe") {
+    ctx.beginPath();
+    ctx.arc(cx, cy, 154 * unit, 0, Math.PI * 2);
+    ctx.moveTo(cx - 154 * unit, cy);
+    ctx.lineTo(cx + 154 * unit, cy);
+    ctx.moveTo(cx, cy - 154 * unit);
+    ctx.bezierCurveTo(cx - 70 * unit, cy - 80 * unit, cx - 70 * unit, cy + 80 * unit, cx, cy + 154 * unit);
+    ctx.moveTo(cx, cy - 154 * unit);
+    ctx.bezierCurveTo(cx + 70 * unit, cy - 80 * unit, cx + 70 * unit, cy + 80 * unit, cx, cy + 154 * unit);
+    ctx.stroke();
+  } else if (icon === "star") {
+    ctx.beginPath();
+    for (let i = 0; i < 10; i += 1) {
+      const radius = i % 2 === 0 ? 168 * unit : 70 * unit;
+      const angle = -Math.PI / 2 + (i * Math.PI) / 5;
+      const x = cx + Math.cos(angle) * radius;
+      const y = cy + Math.sin(angle) * radius;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  ctx.restore();
 }
 
 function canvasToBlob(canvas: HTMLCanvasElement, type = "image/png"): Promise<Blob> {
@@ -120,6 +327,7 @@ function App() {
   const [shape, setShape] = React.useState<Shape>("rounded");
   const [border, setBorder] = React.useState(true);
   const [shadow, setShadow] = React.useState(true);
+  const [selectedIcon, setSelectedIcon] = React.useState<IconKey>("initials");
   const [uploadedLogo, setUploadedLogo] = React.useState<string | null>(null);
   const [copied, setCopied] = React.useState(false);
   const [previewUrl, setPreviewUrl] = React.useState("");
@@ -160,12 +368,14 @@ function App() {
         await image.decode();
         const inset = size * 0.2;
         ctx.drawImage(image, inset, inset, size - inset * 2, size - inset * 2);
-      } else {
+      } else if (selectedIcon === "initials") {
         ctx.fillStyle = iconColor;
         ctx.font = `800 ${size * (displayText.length > 2 ? 0.33 : 0.42)}px Inter, Arial, sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(displayText, size / 2, size / 2 + size * 0.035);
+      } else {
+        drawCanvasIcon(ctx, selectedIcon, size, iconColor);
       }
 
       ctx.restore();
@@ -181,7 +391,7 @@ function App() {
 
       return canvas;
     },
-    [accentColor, bgColor, border, displayText, iconColor, shadow, shape, uploadedLogo],
+    [accentColor, bgColor, border, displayText, iconColor, selectedIcon, shadow, shape, uploadedLogo],
   );
 
   React.useEffect(() => {
@@ -275,6 +485,11 @@ function App() {
     reader.readAsDataURL(file);
   }
 
+  function chooseIcon(icon: IconKey) {
+    setSelectedIcon(icon);
+    setUploadedLogo(null);
+  }
+
   async function copyInstallSnippet() {
     await navigator.clipboard.writeText(installSnippet);
     setCopied(true);
@@ -317,13 +532,41 @@ function App() {
           <div className="input-row">
             <label>
               <span>Initials</span>
-              <input value={initials} onChange={(event) => setInitials(event.target.value)} maxLength={3} placeholder="TP" />
+              <input
+                value={initials}
+                onChange={(event) => {
+                  setInitials(event.target.value);
+                  setSelectedIcon("initials");
+                  setUploadedLogo(null);
+                }}
+                maxLength={3}
+                placeholder="TP"
+              />
             </label>
             <label className="upload-box">
               <ImagePlus size={18} />
               <span>{uploadedLogo ? "Logo loaded" : "Upload logo"}</span>
               <input type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" onChange={handleLogoUpload} />
             </label>
+          </div>
+
+          <div className="icon-picker">
+            <span className="field-title">Icon picker</span>
+            <div className="icon-grid">
+              {iconOptions.map(({ key, label, Icon }) => (
+                <button
+                  aria-pressed={selectedIcon === key && !uploadedLogo}
+                  className={selectedIcon === key && !uploadedLogo ? "active" : ""}
+                  key={key}
+                  type="button"
+                  title={label}
+                  onClick={() => chooseIcon(key)}
+                >
+                  <Icon size={20} />
+                  <span>{label}</span>
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="preset-grid">

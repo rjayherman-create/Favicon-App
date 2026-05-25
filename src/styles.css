@@ -166,6 +166,7 @@ input:not([type="color"]) {
 
 .preset-grid button,
 .shape-grid button,
+.icon-grid button,
 .export-grid button,
 .primary-action,
 .install-band button {
@@ -188,6 +189,35 @@ input:not([type="color"]) {
   border-radius: 50%;
 }
 
+.icon-picker {
+  margin-top: 18px;
+}
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.icon-grid button {
+  display: grid;
+  min-height: 74px;
+  place-items: center;
+  gap: 6px;
+  padding: 10px 6px;
+}
+
+.icon-grid button span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: inherit;
+  font-size: 0.72rem;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
 input[type="color"] {
   width: 100%;
   height: 46px;
@@ -205,6 +235,7 @@ input[type="color"] {
 }
 
 .shape-grid .active,
+.icon-grid .active,
 .accent-button,
 .primary-action {
   border-color: #111827;
@@ -346,5 +377,9 @@ pre {
 
   .shape-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .icon-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
